@@ -9,8 +9,10 @@ class Program
     static void Main(string[] args)
     {
         var db = new AppDbContext();
+        var running = true;
 
 
+        while (running) {
         // ask employee what to do (add borrower, add equipment, check in equipment, check out equipment)
         var choice = AnsiConsole.Prompt(
             new SelectionPrompt<string>().Title("What would you like to do?").AddChoices("Check Out Equipment", "Check In Equipment", "Add Borrower", "Add Equipment", "Quit")
@@ -138,7 +140,7 @@ class Program
                     {
                         var reservation = new Reservation { beginDateTime=beginDateTime, endDateTime=endDateTime, equipment=item, borrower=selectedBorrower };
                         db.Reservation.Add(reservation);
-                        item.inInventory= false;
+                        item.inInventory = false;
 
                         db.SaveChanges();
                     }
@@ -216,8 +218,10 @@ class Program
             case ("Quit"):
                 {
                     Console.WriteLine("Quit");
+                    running = false;
                     break;
                 }
+        }
         }
 
 
@@ -225,20 +229,20 @@ class Program
         // db.Equipment.Add(new Equipment { Name="Test Baseball", Status=EquipmentStatus.Undamaged, ValueInDecimal=4, inInventory = true });
         // db.SaveChanges();
 
-        List<Equipment> equipmentList = db.Equipment.ToList();
+        // List<Equipment> equipmentList = db.Equipment.ToList();
 
-        var table = new Table();
-        table.AddColumn("ID");
-        table.AddColumn("Name");
-        table.AddColumn("Status");
-        table.AddColumn("In Inventory");
-        table.AddColumn("Value");
-        for (int i = 0; i < equipmentList.Count; i++)
-        {
-            var e = equipmentList[i];
-            table.AddRow(e.Id.ToString(), e.Name, e.Status.ToString(), e.inInventory.ToString(), e.ValueInDecimal.ToString());
-        }
+        // var table = new Table();
+        // table.AddColumn("ID");
+        // table.AddColumn("Name");
+        // table.AddColumn("Status");
+        // table.AddColumn("In Inventory");
+        // table.AddColumn("Value");
+        // for (int i = 0; i < equipmentList.Count; i++)
+        // {
+        //     var e = equipmentList[i];
+        //     table.AddRow(e.Id.ToString(), e.Name, e.Status.ToString(), e.inInventory.ToString(), e.ValueInDecimal.ToString());
+        // }
 
-        AnsiConsole.Write(table);
+        // AnsiConsole.Write(table);
     }
 }
