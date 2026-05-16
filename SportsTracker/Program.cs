@@ -56,7 +56,7 @@ class Program
                     .Title("Select borrower to assign to")
                     .AddChoices(borrowerChoices));
 
-                    Borrower selectedBorrower;
+                    Borrower? selectedBorrower = null;
                     if (borrowerString == "Add New Borrower")
                     {
                         Borrower? maybeBorrower = BorrowerUI.AddBorrower(db);
@@ -74,6 +74,10 @@ class Program
                         {
                             selectedBorrower = possibleBorrower;
                         }
+                    }
+                    if (selectedBorrower == null)
+                    {
+                        break;
                     }
 
                     var today = DateTime.Now;
@@ -114,8 +118,10 @@ class Program
 
                     foreach (var item in selectedEquipment)
                     {
-                        var reservation = new Reservation { beginDateTime=beginDateTime, endDateTime=endDateTime, equipment=item, borrower=selectedBorrower }
+                        var reservation = new Reservation { beginDateTime=beginDateTime, endDateTime=endDateTime, equipment=item, borrower=selectedBorrower };
                         db.Reservation.Add(reservation);
+                        item.inInventory= false;
+
                         db.SaveChanges();
                     }
 
