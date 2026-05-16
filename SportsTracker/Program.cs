@@ -36,9 +36,87 @@ class Program
                     .AddChoices(equipmentChoices.ToArray()));
 
 
+                    var selectedEquipmentIds = new List<Int32>();
                     foreach (var item in selected)
                     {
-                        Console.WriteLine(item.Split(":")[0]);
+                        selectedEquipmentIds.Add(Int32.Parse(item.Split(":")[0]));
+                    }
+
+                    var selectedEquipment = equipment.FindAll(equipment => selectedEquipmentIds.Contains(equipment.Id));
+
+                    var borrowers = db.Borrower.ToList();
+                    var borrowerChoices = new List<string>();
+                    foreach (var borrower in borrowers)
+                    {
+                        borrowerChoices.Add(borrower.Id.ToString() + ":" + borrower.Name + " (" + borrower.PhoneNumber.ToString() + ")");
+                    }
+                    borrowerChoices.Add("Add New Borrower");
+
+                    var borrowerString = AnsiConsole.Prompt(new SelectionPrompt<string>()
+                    .Title("Select borrower to assign to")
+                    .AddChoices(borrowerChoices));
+
+                    Borrower selectedBorrower;
+                    if (borrowerString == "Add New Borrower")
+                    {
+                        Borrower? maybeBorrower = BorrowerUI.AddBorrower(db);
+
+                        if (maybeBorrower != null)
+                        {
+                            selectedBorrower = maybeBorrower;
+                        }
+                    } else
+                    {
+                        int borrowerId = Int32.Parse(borrowerString.Split(":")[0]);
+                        Borrower? possibleBorrower = db.Borrower.Find(borrowerId);
+
+                        if (possibleBorrower != null)
+                        {
+                            selectedBorrower = possibleBorrower;
+                        }
+                    }
+
+                    var today = DateTime.Now;
+
+                    var dateOptions = new List<string>();
+                    for (int i = 0; i < 7; i++)
+                    {
+                        var date = today.AddDays(i);
+                        dateOptions.Add(date.ToLongDateString());
+                    }
+
+
+                    var fromDate = AnsiConsole.Prompt(new SelectionPrompt<string>()
+                    .Title("Select checkout date")
+                    .AddChoices(dateOptions));
+
+                    var hours = new List<string>([
+                        "8:00 am",
+                        "9:00 am",
+                        "10:00 am",
+                        "11:00 am",
+                        "12:00 pm",
+                        "1:00 pm",
+                        "2:00 pm",
+                        "3:00 pm",
+                        "4:00 pm",
+                        "5:00 pm",
+                        "6:00 pm",
+                        "7:00 pm",
+                        "8:00 pm",
+                    ]);
+
+                    var fromTime = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Checkout Time").AddChoices(hours));
+                    var toTime = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Return Time").AddChoices(hours));
+
+                    var beginDateTime = DateTime.Parse(fromDate + " " + fromTime);
+                    var endDateTime = DateTime.Parse(fromDate + " " + toTime);
+
+                    foreach (var item in selectedEquipment)
+                    {
+                        var reservation = new Reservation { beginDateTime=beginDateTime, endDateTime=endDateTime, equipment=item, borrower=selectedBorrower }
+                        db.Reservation.Add(reservation);
+                        db.SaveChanges();
                     }
 
                     break;
@@ -50,26 +128,7 @@ class Program
                 }
             case ("Add Borrower"):
                 {
-                    Console.WriteLine("Add Borrower");
-                    var getName = new TextPrompt<string>("Borrower Name: ").Validate(input => input.Length > 2, "[red]Must be at least 2 characters long.[/]");
-                    var name = AnsiConsole.Prompt(getName);
-                    
-                    var getPhoneNumber = new TextPrompt<string>("Phone Number").Validate(input => input.Count(char.IsDigit) == 10, "Must enter a 10 digit phone number");
-                    var phoneNumber = AnsiConsole.Prompt(getPhoneNumber);
-
-                    Console.WriteLine("About to create:");
-                    var newBorrower = new Table();
-                    newBorrower.AddColumn("Name");
-                    newBorrower.AddColumn("Phone Number");
-                    newBorrower.AddRow(name, phoneNumber);
-                    AnsiConsole.Write(newBorrower);
-
-                    if (AnsiConsole.Confirm("Create this Borrower?"))
-                    {
-                        db.Borrower.Add(new Borrower { Name=name, PhoneNumber=phoneNumber });
-                        db.SaveChanges();
-                    }
-
+                    BorrowerUI.AddBorrower(db);
                     break;
                 }
             case ("Add Equipment"):
