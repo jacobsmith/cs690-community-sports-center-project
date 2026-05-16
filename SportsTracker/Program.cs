@@ -148,6 +148,34 @@ class Program
             case ("Check In Equipment"):
                 {
                     Console.WriteLine("Check In Equipment");
+
+                    List<Equipment> equipment = db.Equipment.ToList();
+                    var equipmentChoices = new List<string>();
+                    foreach (var item in equipment)
+                    {
+                        if (!item.inInventory) {
+                            equipmentChoices.Add(item.Id + ":" + item.Name);
+                        }
+                    }
+
+                    var selected = AnsiConsole.Prompt(new MultiSelectionPrompt<string>()
+                    .Title("Select equipment to check in")
+                    .AddChoices(equipmentChoices.ToArray()));
+
+
+                    var selectedEquipmentIds = new List<Int32>();
+                    foreach (var item in selected)
+                    {
+                        selectedEquipmentIds.Add(Int32.Parse(item.Split(":")[0]));
+                    }
+
+                    var selectedEquipment = equipment.FindAll(equipment => selectedEquipmentIds.Contains(equipment.Id));
+
+                    foreach (var item in selectedEquipment)
+                    {
+                        item.inInventory = true;
+                    }
+                    db.SaveChanges();
                     break;
                 }
             case ("Add Borrower"):
