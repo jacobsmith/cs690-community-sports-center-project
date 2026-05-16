@@ -1,5 +1,6 @@
 ﻿namespace SportsTracker;
 
+using System.Collections;
 using System.Numerics;
 using Spectre.Console;
 
@@ -20,6 +21,26 @@ class Program
             case ("Check Out Equipment"):
                 {
                     Console.WriteLine("Check Out");
+
+                    List<Equipment> equipment = db.Equipment.ToList();
+                    var equipmentChoices = new List<string>();
+                    foreach (var item in equipment)
+                    {
+                        if (item.inInventory && item.Status == EquipmentStatus.Undamaged) {
+                            equipmentChoices.Add(item.Id + ":" + item.Name);
+                        }
+                    }
+
+                    var selected = AnsiConsole.Prompt(new MultiSelectionPrompt<string>()
+                    .Title("Select equipment to check out")
+                    .AddChoices(equipmentChoices.ToArray()));
+
+
+                    foreach (var item in selected)
+                    {
+                        Console.WriteLine(item.Split(":")[0]);
+                    }
+
                     break;
                 }
             case ("Check In Equipment"):
