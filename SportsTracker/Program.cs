@@ -111,7 +111,25 @@ class Program
                     ]);
 
                     var fromTime = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Checkout Time").AddChoices(hours));
-                    var toTime = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Return Time").AddChoices(hours));
+
+                    // Only show hours after the checkout time
+                    var toHours = new List<string>();
+                    var haveSeenFromTime = false;
+                    for (var i = 0; i < hours.Count; i++)
+                    {
+                        if (fromTime == hours[i])
+                        {
+                            haveSeenFromTime = true;
+                            continue;
+                        }
+
+                        if (haveSeenFromTime)
+                        {
+                            toHours.Add(hours[i]);
+                        }
+                    }
+
+                    var toTime = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Return Time").AddChoices(toHours));
 
                     var beginDateTime = DateTime.Parse(fromDate + " " + fromTime);
                     var endDateTime = DateTime.Parse(fromDate + " " + toTime);
