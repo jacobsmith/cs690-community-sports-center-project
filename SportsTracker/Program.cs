@@ -3,12 +3,16 @@
 using System.Collections;
 using System.Numerics;
 using Spectre.Console;
+using Microsoft.EntityFrameworkCore;
+
 
 class Program
 {
     static void Main(string[] args)
     {
         var db = new AppDbContext();
+        db.Database.Migrate();
+
         var running = true;
 
 
@@ -32,6 +36,14 @@ class Program
                             equipmentChoices.Add(item.Id + ":" + item.Name);
                         }
                     }
+
+                    if (equipment.Count == 0)
+                        {
+                            Console.WriteLine("No equipment yet. Add new equipment before checking out.");
+                            AnsiConsole.Markup("Press any key to continue...");
+                            Console.ReadKey();
+                            break;
+                        }
 
                     var selected = AnsiConsole.Prompt(new MultiSelectionPrompt<string>()
                     .Title("Select equipment to check out")
@@ -160,6 +172,15 @@ class Program
                         }
                     }
 
+
+                    if (equipmentChoices.Count == 0)
+                        {
+                            Console.WriteLine("No equipment is currently checked out.");
+                            AnsiConsole.Markup("Press any key to continue...");
+                            Console.ReadKey();
+                            break;
+                        }
+
                     var selected = AnsiConsole.Prompt(new MultiSelectionPrompt<string>()
                     .Title("Select equipment to check in")
                     .AddChoices(equipmentChoices.ToArray()));
@@ -201,9 +222,9 @@ class Program
                     Console.WriteLine("About to create:");
                     var newEquipment = new Table();
                     newEquipment.AddColumn("Name");
-                    newEquipment.AddColumn("Status");
+                    newEquipment.AddColumn("Value");
 
-                    // newEquipment.AddRow(name, damagedStatus);
+                    newEquipment.AddRow(name, "$" + value.ToString());
                     AnsiConsole.Write(newEquipment);
 
                     if (AnsiConsole.Confirm("Create this piece of equipment?"))
@@ -222,6 +243,8 @@ class Program
                     break;
                 }
         }
+
+        Console.Clear();
         }
 
 

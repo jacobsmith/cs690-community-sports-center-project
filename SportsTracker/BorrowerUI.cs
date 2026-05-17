@@ -10,7 +10,7 @@ class BorrowerUI
                     var getName = new TextPrompt<string>("Borrower Name: ").Validate(input => input.Length > 2, "[red]Must be at least 2 characters long.[/]");
                     var name = AnsiConsole.Prompt(getName);
                     
-                    var getPhoneNumber = new TextPrompt<string>("Phone Number").Validate(input => input.Count(char.IsDigit) == 10, "Must enter a 10 digit phone number");
+                    var getPhoneNumber = new TextPrompt<string>("Phone Number: ").Validate(input => input.Count(char.IsDigit) == 10, "Must enter a 10 digit phone number");
                     var phoneNumber = AnsiConsole.Prompt(getPhoneNumber);
 
                     Console.WriteLine("About to create:");
