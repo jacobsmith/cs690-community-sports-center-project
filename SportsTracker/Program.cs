@@ -19,7 +19,7 @@ class Program
         while (running) {
         // ask employee what to do (add borrower, add equipment, check in equipment, check out equipment)
         var choice = AnsiConsole.Prompt(
-            new SelectionPrompt<string>().Title("What would you like to do?").AddChoices("Check Out Equipment", "Check In Equipment", "Add Borrower", "Add Equipment", "Quit")
+            new SelectionPrompt<string>().Title("What would you like to do?").AddChoices("Check Out Equipment", "Check In Equipment", "View All Equipment", "Add Borrower", "Add Equipment", "Quit")
         );
 
         switch (choice)
@@ -199,6 +199,24 @@ class Program
                         item.inInventory = true;
                     }
                     db.SaveChanges();
+                    break;
+                }
+            case ("View All Equipment"):
+                {
+                    List<Equipment> equipment = db.Equipment.ToList();
+                    var table = new Table();
+                    table.AddColumn("Name");
+                    table.AddColumn("In Stock");
+
+                    foreach (var item in equipment)
+                        {
+                            table.AddRow(item.Name, item.inInventory.ToString());
+                        }
+
+                    AnsiConsole.Write(table);
+                    AnsiConsole.Markup("Press any key to continue...");
+                    Console.ReadKey();
+
                     break;
                 }
             case ("Add Borrower"):
