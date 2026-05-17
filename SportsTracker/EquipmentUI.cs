@@ -37,39 +37,11 @@ class EquipmentUI
 
         Console.WriteLine("Check In Equipment");
 
-        List<Equipment> equipment = db.Equipment.ToList();
-        var equipmentChoices = new List<string>();
-        foreach (var item in equipment)
-        {
-            if (!item.inInventory)
-            {
-                equipmentChoices.Add(item.Id + ":" + item.Name);
-            }
-        }
+        List<Equipment> equipment = db.Equipment.Where(item => !item.inInventory).ToList();
 
+        var selection = new Selector<Equipment>(equipment).GetSelection();
 
-        if (equipmentChoices.Count == 0)
-        {
-            Console.WriteLine("No equipment is currently checked out.");
-            AnsiConsole.Markup("Press any key to continue...");
-            Console.ReadKey();
-            return;
-        }
-
-        var selected = AnsiConsole.Prompt(new MultiSelectionPrompt<string>()
-        .Title("Select equipment to check in")
-        .AddChoices(equipmentChoices.ToArray()));
-
-
-        var selectedEquipmentIds = new List<Int32>();
-        foreach (var item in selected)
-        {
-            selectedEquipmentIds.Add(Int32.Parse(item.Split(":")[0]));
-        }
-
-        var selectedEquipment = equipment.FindAll(equipment => selectedEquipmentIds.Contains(equipment.Id));
-
-        foreach (var item in selectedEquipment)
+        foreach (var item in selection)
         {
             item.inInventory = true;
         }
@@ -98,36 +70,14 @@ class EquipmentUI
     {
         Console.WriteLine("Check Out");
 
-        List<Equipment> equipment = db.Equipment.ToList();
-        var equipmentChoices = new List<string>();
-        foreach (var item in equipment)
-        {
-            if (item.inInventory && item.Status == EquipmentStatus.Undamaged)
-            {
-                equipmentChoices.Add(item.Id + ":" + item.Name);
-            }
-        }
+        List<Equipment> equipment = db.Equipment.Where(item => item.inInventory).Where(item => item.Status == EquipmentStatus.Undamaged).ToList();
+        var selectedEquipment = new Selector<Equipment>(equipment).GetSelection();
 
-        if (equipment.Count == 0)
+        if (selectedEquipment.Count == 0)
         {
-            Console.WriteLine("No equipment yet. Add new equipment before checking out.");
-            AnsiConsole.Markup("Press any key to continue...");
-            Console.ReadKey();
             return;
         }
 
-        var selected = AnsiConsole.Prompt(new MultiSelectionPrompt<string>()
-        .Title("Select equipment to check out")
-        .AddChoices(equipmentChoices.ToArray()));
-
-
-        var selectedEquipmentIds = new List<Int32>();
-        foreach (var item in selected)
-        {
-            selectedEquipmentIds.Add(Int32.Parse(item.Split(":")[0]));
-        }
-
-        var selectedEquipment = equipment.FindAll(equipment => selectedEquipmentIds.Contains(equipment.Id));
 
         var borrowers = db.Borrower.ToList();
         var borrowerChoices = new List<string>();

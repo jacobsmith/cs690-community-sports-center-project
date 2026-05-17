@@ -6,11 +6,15 @@ public enum EquipmentStatus
     Damaged
 }
 
-public class Equipment
+public class Equipment : BaseEntity
 {
-    public int Id { get; set; }
     public required string Name { get; set; }
     public required decimal ValueInDecimal { get; set; }
     public required EquipmentStatus Status { get; set; }
     public required Boolean inInventory { get; set; }
+
+    override public string SelectionDisplay()
+    {
+        return this.Name;
+    }
 }
