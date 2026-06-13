@@ -6,22 +6,11 @@ using SportsTracker;
 class Selector<T> where T: BaseEntity
 {
     List<T> choices;
-    // List<T>? databaseCollection = null;
 
     public Selector(List<T> choices)
     {
         this.choices = choices;
     }
-
-    // public void SetChoices(List<T> choices)
-    // {
-    //     this.choices = choices;
-    // }
-
-    // public void SetDatabaseCollection(List<T> databaseCollection)
-    // {
-    //     this.databaseCollection = databaseCollection;
-    // }
 
     public List<T> GetSelection()
     {
