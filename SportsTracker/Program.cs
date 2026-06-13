@@ -1,11 +1,5 @@
 ﻿namespace SportsTracker;
 
-using System.Collections;
-using System.Numerics;
-using Spectre.Console;
-using Microsoft.EntityFrameworkCore;
-
-
 class Program
 {
     static void Main(string[] args)
@@ -16,41 +10,48 @@ class Program
         var running = true;
         Console.Clear();
 
+        string CheckOut = "Check Out Equipment";
+        string CheckIn = "Check In Equipment";
+        string ViewAll = "View All Equipment";
+        string AddBorrower = "Add Borrower";
+        string AddEquipment = "Add Equipment";
+        string Quit = Quit;
+
 
         while (running) {
         // ask employee what to do (add borrower, add equipment, check in equipment, check out equipment)
         var choice = AnsiConsole.Prompt(
-            new SelectionPrompt<string>().Title("What would you like to do?").AddChoices("Check Out Equipment", "Check In Equipment", "View All Equipment", "Add Borrower", "Add Equipment", "Quit")
+            new SelectionPrompt<string>().Title("What would you like to do?").AddChoices(CheckOut, CheckIn, ViewAll, AddBorrower, AddEquipment, Quit)
         );
 
         switch (choice)
         {
-            case ("Check Out Equipment"):
+            case (CheckOut):
                 {
                     EquipmentUI.CheckOutEquipment(db);
                     break;
                 }
-            case ("Check In Equipment"):
+            case (CheckIn):
                 {
                     EquipmentUI.CheckInEquipment(db);
                     break;
                 }
-            case ("View All Equipment"):
+            case (ViewAll):
                 {
                     EquipmentUI.ViewAllEquipment(db);
                     break;
                 }
-            case ("Add Borrower"):
+            case (AddBorrower):
                 {
                     BorrowerUI.AddBorrower(db);
                     break;
                 }
-            case ("Add Equipment"):
+            case (AddEquipment):
                 {
                     EquipmentUI.AddEquipment(db);
                     break;
                 }
-            case ("Quit"):
+            case (Quit):
                 {
                     Console.WriteLine("Quit");
                     running = false;
@@ -60,26 +61,5 @@ class Program
 
         Console.Clear();
         }
-
-
-
-        // db.Equipment.Add(new Equipment { Name="Test Baseball", Status=EquipmentStatus.Undamaged, ValueInDecimal=4, inInventory = true });
-        // db.SaveChanges();
-
-        // List<Equipment> equipmentList = db.Equipment.ToList();
-
-        // var table = new Table();
-        // table.AddColumn("ID");
-        // table.AddColumn("Name");
-        // table.AddColumn("Status");
-        // table.AddColumn("In Inventory");
-        // table.AddColumn("Value");
-        // for (int i = 0; i < equipmentList.Count; i++)
-        // {
-        //     var e = equipmentList[i];
-        //     table.AddRow(e.Id.ToString(), e.Name, e.Status.ToString(), e.inInventory.ToString(), e.ValueInDecimal.ToString());
-        // }
-
-        // AnsiConsole.Write(table);
     }
 }
