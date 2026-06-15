@@ -12,7 +12,32 @@ class Selector<T> where T: BaseEntity
         this.choices = choices;
     }
 
-    public List<T> GetSelection()
+    public T GetSelectionSingular()
+    {
+        if (this.choices.Count == 0)
+        {
+            Console.WriteLine("No items to select from. Press any key to continue.");
+            Console.ReadKey();
+            return null;
+        }
+
+        var choices = new List<string>();
+        foreach (var item in this.choices)
+        {
+            choices.Add(item.Id.ToString() + ":" + item.SelectionDisplay());
+        }
+
+            var selected = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                .Title("Select")
+                .AddChoices(choices.ToArray())
+            );
+            
+            var selectedItemId = Int32.Parse(selected.Split(":")[0]);
+            return this.choices.Find(equipment => equipment.Id == selectedItemId);
+    }
+
+    public List<T> GetSelectionMultiple(Boolean singular = false)
     {
         if (this.choices.Count == 0)
         {
@@ -32,8 +57,7 @@ class Selector<T> where T: BaseEntity
             .Title("Select")
             .AddChoices(choices.ToArray())
         );
-
-
+    
         var selectedItems = new List<Int32>();
         foreach (var item in selected)
         {
@@ -41,8 +65,7 @@ class Selector<T> where T: BaseEntity
         }
 
         var selectedEquipment = this.choices.FindAll(equipment => selectedItems.Contains(equipment.Id));
-
         return selectedEquipment;
-    }
 
+    }
 }

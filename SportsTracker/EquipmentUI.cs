@@ -1,3 +1,4 @@
+namespace SportsTracker;
 using SportsTracker;
 using Spectre.Console;
 
@@ -39,13 +40,11 @@ class EquipmentUI
 
         List<Equipment> equipment = db.Equipment.Where(item => !item.inInventory).ToList();
 
-        var selection = new Selector<Equipment>(equipment).GetSelection();
-
-        foreach (var item in selection)
-        {
+        var item = new Selector<Equipment>(equipment).GetSelectionSingular();
+        if (item != null) {
             item.inInventory = true;
+            db.SaveChanges();
         }
-        db.SaveChanges();
     }
 
     public static void ViewAllEquipment(AppDbContext db)
@@ -71,7 +70,7 @@ class EquipmentUI
         Console.WriteLine("Check Out");
 
         List<Equipment> equipment = db.Equipment.Where(item => item.inInventory).Where(item => item.Status == EquipmentStatus.Undamaged).ToList();
-        var selectedEquipment = new Selector<Equipment>(equipment).GetSelection();
+        var selectedEquipment = new Selector<Equipment>(equipment).GetSelectionMultiple();
 
         if (selectedEquipment.Count == 0)
         {

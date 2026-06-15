@@ -1,4 +1,11 @@
-﻿namespace SportsTracker;
+﻿using System.Collections;
+using System.Runtime.InteropServices.Swift;
+using Spectre.Console;
+using SportsTracker;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+
+namespace SportsTracker;
 
 class Program
 {
@@ -10,12 +17,12 @@ class Program
         var running = true;
         Console.Clear();
 
-        string CheckOut = "Check Out Equipment";
-        string CheckIn = "Check In Equipment";
-        string ViewAll = "View All Equipment";
-        string AddBorrower = "Add Borrower";
-        string AddEquipment = "Add Equipment";
-        string Quit = Quit;
+        const string CheckOut = "Check Out Equipment";
+        const string CheckIn = "Check In Equipment";
+        const string ViewAll = "View All Equipment";
+        const string AddBorrower = "Add Borrower";
+        const string AddEquipment = "Add Equipment";
+        const string Quit = "Quit";
 
 
         while (running) {
