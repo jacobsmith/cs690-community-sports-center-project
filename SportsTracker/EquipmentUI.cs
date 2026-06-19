@@ -42,6 +42,25 @@ class EquipmentUI
 
         var item = new Selector<Equipment>(equipment).GetSelectionSingular();
         if (item != null) {
+
+            var selected = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                .Title("Item has damage?")
+                .AddChoices(["yes", "no"])
+            );
+
+            if (selected == "yes")
+            {
+                var getValue = AnsiConsole.Prompt(new TextPrompt<string>("Approximate value of damages: ").Validate(input => input.Contains("."), "Must enter dollar amount"));
+                var value = decimal.Parse(getValue);
+
+
+
+                db.EquipmentDamange.Add(new EquipmentDamage { equipment = item, borrower =  })
+            }
+
+
+
             item.inInventory = true;
             db.SaveChanges();
         }
@@ -169,11 +188,19 @@ class EquipmentUI
         var beginDateTime = DateTime.Parse(fromDate + " " + fromTime);
         var endDateTime = DateTime.Parse(fromDate + " " + toTime);
 
+
+        var borrowerHasItem = AnsiConsole.Prompt(
+            new SelectionPrompt<string>()
+            .Title("Borrower is taking item now?")
+            .AddChoices(["yes", "no"])
+        ) == "yes";
+
+
         foreach (var item in selectedEquipment)
         {
-            var reservation = new Reservation { beginDateTime = beginDateTime, endDateTime = endDateTime, equipment = item, borrower = selectedBorrower };
+            var reservation = new Reservation { beginDateTime = beginDateTime, endDateTime = endDateTime, equipment = item, borrower = selectedBorrower, borrowerHasItem = borrowerHasItem };
             db.Reservation.Add(reservation);
-            item.inInventory = false;
+            item.inInventory = !borrowerHasItem;
 
             db.SaveChanges();
         }

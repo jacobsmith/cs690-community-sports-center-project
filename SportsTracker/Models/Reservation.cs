@@ -2,14 +2,15 @@ namespace SportsTracker;
 
 public class Reservation : BaseEntity
 {
-    public required Equipment equipment { get; set; }
     public required DateTime beginDateTime { get; set; }
     public required DateTime endDateTime { get; set; }
 
-    public required Borrower borrower { get; set; }
+    public ICollection<EquipmentReservation> EquipmentReservations { get; set; } = new List<EquipmentReservation>();
 
     override public string SelectionDisplay()
     {
-        return this.equipment.SelectionDisplay() + " " + this.borrower.SelectionDisplay();
+        string start = this.beginDateTime.ToString("yyyy-MM-dd HH:mm");
+        string end = this.endDateTime.ToString("HH:mm");
+        return start + " - " + end + "     " + this.equipment.SelectionDisplay() + " " + this.borrower.SelectionDisplay();
     }
 }

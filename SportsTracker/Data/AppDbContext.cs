@@ -9,6 +9,8 @@ public class AppDbContext : DbContext
     public DbSet<Reservation> Reservation { get; set; }
     public DbSet<EquipmentDamage> EquipmentDamage { get; set; }
 
+    public DbSet<EquipmentReservation> EquipmentReservation { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseSqlite("Data Source=sports.db");

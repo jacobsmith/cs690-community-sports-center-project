@@ -13,6 +13,11 @@ public class Equipment : BaseEntity
     public required EquipmentStatus Status { get; set; }
     public required Boolean inInventory { get; set; }
 
+    // allow for a reservation to end early, not be returned on time, etc.
+    public int? currentlyActiveReservationId { get; set; }
+    public Reservation CurrentlyActiveReservation { get; set; }
+
+    public ICollection<EquipmentReservation> EquipmentReservations { get; set; } = new List<EquipmentReservation>();
     override public string SelectionDisplay()
     {
         return this.Name;
