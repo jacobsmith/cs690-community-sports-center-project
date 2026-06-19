@@ -11,6 +11,8 @@ public class Reservation : BaseEntity
     {
         string start = this.beginDateTime.ToString("yyyy-MM-dd HH:mm");
         string end = this.endDateTime.ToString("HH:mm");
-        return start + " - " + end + "     " + this.equipment.SelectionDisplay() + " " + this.borrower.SelectionDisplay();
+
+        string equipmentCount = this.EquipmentReservations.Count().ToString();
+        return start + " - " + end + "     " + equipmentCount + " items"; 
     }
 }

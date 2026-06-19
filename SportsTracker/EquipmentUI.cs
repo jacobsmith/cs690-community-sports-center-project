@@ -56,7 +56,7 @@ class EquipmentUI
 
 
 
-                db.EquipmentDamange.Add(new EquipmentDamage { equipment = item, borrower =  })
+                // db.EquipmentDamange.Add(new EquipmentDamage { equipment = item, borrower =  })
             }
 
 
@@ -196,14 +196,14 @@ class EquipmentUI
         ) == "yes";
 
 
-        foreach (var item in selectedEquipment)
-        {
-            var reservation = new Reservation { beginDateTime = beginDateTime, endDateTime = endDateTime, equipment = item, borrower = selectedBorrower, borrowerHasItem = borrowerHasItem };
-            db.Reservation.Add(reservation);
-            item.inInventory = !borrowerHasItem;
+        // foreach (var item in selectedEquipment)
+        // {
+        //     var reservation = new Reservation { beginDateTime = beginDateTime, endDateTime = endDateTime, equipment = item, borrower = selectedBorrower, borrowerHasItem = borrowerHasItem };
+        //     db.Reservation.Add(reservation);
+        //     item.inInventory = !borrowerHasItem;
 
-            db.SaveChanges();
-        }
+        //     db.SaveChanges();
+        // }
 
 
     }
