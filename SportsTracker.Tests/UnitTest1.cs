@@ -1,4 +1,6 @@
-﻿namespace SportsTracker.Tests;
+﻿using System.Runtime.CompilerServices;
+
+namespace SportsTracker;
 
 public class UnitTest1
 {
@@ -6,14 +8,21 @@ public class UnitTest1
     [Fact]
     public async Task CanAddAndRetrieveEquipment()
     {
-        var _context = new TestDbContextFactory();
-        var equipment = new Equipment { Name = "Soccer Ball" };
+        var factory = new TestDbContextFactory();
+        var _context = factory.Context;
+        var equipment = new Equipment
+        {
+            Name = "Soccer Ball",
+            ValueInDecimal = 10.0M,
+            Status = EquipmentStatus.Undamaged,
+            inInventory = true
+        };
         _context.Equipment.Add(equipment);
         await _context.SaveChangesAsync();
 
-        var retrieved = await _context.Equipment.FirstOrDefaultAsync(e => e.Name == "Soccer Ball");
+        var retrieved = _context.Equipment.Where(item => item.Name == "Soccer Ball").ToList();
 
         Assert.NotNull(retrieved);
-        Assert.Equal("Soccer Ball", retrieved.Name);
+        Assert.Equal("Soccer Ball", retrieved[0].Name);
     }
 }

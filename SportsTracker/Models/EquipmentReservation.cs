@@ -7,7 +7,7 @@ public class EquipmentReservation : BaseEntity
 
     public required int equipmentId { get; set; }
 
-    public EquipmentReservation Equipment { get; set; }
+    public Equipment Equipment { get; set; }
 
     public required Borrower borrower { get; set; }
 
