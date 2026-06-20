@@ -44,12 +44,15 @@ class BorrowerUI
         table.AddColumn("Name");
         table.AddColumn("Phone Number");
         table.AddColumn("Currently Checked Out");
+        table.AddColumn("Total Damage");
 
-        foreach (var borrower in borrowers)
+        foreach (var borrowerToPrint in borrowers)
         {
+            var totalDamage = borrowerToPrint.EquipmentDamages.Where(ed => ed.paid == false).Sum(ed => ed.damageAmount);
+            var activeReservations = borrowerToPrint.EquipmentReservations.Where(er => er.Equipment.currentlyActiveReservationId == er.reservationId);
 
-            var activeReservations = borrower.EquipmentReservations.Where(er => er.Equipment.currentlyActiveReservationId == er.reservationId);
-            table.AddRow(borrower.Id.ToString(), borrower.Name, borrower.PhoneNumber, borrower.EquipmentReservations.Count.ToString() + " items");
+            table.AddRow(borrowerToPrint.Id.ToString(), borrowerToPrint.Name, borrowerToPrint.PhoneNumber, borrowerToPrint.EquipmentReservations.Count.ToString() + " items", totalDamage.ToString());
+
             foreach (var activeReservation in activeReservations)
             {
                 table.AddRow("", "", "", activeReservation.Equipment.Name);
@@ -57,8 +60,21 @@ class BorrowerUI
             table.AddEmptyRow(); // blank row between borrowers
         }
         AnsiConsole.Write(table);
+        
+        var getId = AnsiConsole.Prompt(new TextPrompt<string>("ID of borrower to mark as paid or Q to quit: "));
 
-        AnsiConsole.Markup("Press any key to continue...");
-        Console.ReadKey();
+        if (getId.ToUpper() == "Q")
+        {
+            return;
+        }
+
+        var id = int.Parse(getId);
+        var borrower = db.Borrower.Find(id);
+        if (borrower != null)
+        {
+            borrower.EquipmentDamages.Where(ed => ed.paid == false).ToList().ForEach(ed => ed.paid = true);
+            db.SaveChanges();
+        }
+
     }
 }
