@@ -1,6 +1,7 @@
 using SportsTracker;
 using Spectre.Console;
 using System.Data.Common;
+using Microsoft.EntityFrameworkCore;
 
 class BorrowerUI
 {
@@ -31,5 +32,33 @@ class BorrowerUI
 
                     return null;
 
+    }
+
+    public static void ViewBorrowers(AppDbContext db)
+    {
+        Console.WriteLine("View Borrowers");
+
+        List<Borrower> borrowers = db.Borrower.Include(b => b.EquipmentReservations).ThenInclude(er => er.Equipment).Include(b => b.EquipmentDamages).ToList();
+        var table = new Table();
+        table.AddColumn("Id");
+        table.AddColumn("Name");
+        table.AddColumn("Phone Number");
+        table.AddColumn("Currently Checked Out");
+
+        foreach (var borrower in borrowers)
+        {
+
+            var activeReservations = borrower.EquipmentReservations.Where(er => er.Equipment.currentlyActiveReservationId == er.reservationId);
+            table.AddRow(borrower.Id.ToString(), borrower.Name, borrower.PhoneNumber, borrower.EquipmentReservations.Count.ToString() + " items");
+            foreach (var activeReservation in activeReservations)
+            {
+                table.AddRow("", "", "", activeReservation.Equipment.Name);
+            }
+            table.AddEmptyRow(); // blank row between borrowers
+        }
+        AnsiConsole.Write(table);
+
+        AnsiConsole.Markup("Press any key to continue...");
+        Console.ReadKey();
     }
 }

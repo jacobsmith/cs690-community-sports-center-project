@@ -104,6 +104,8 @@ class EquipmentUI
         }
 
         AnsiConsole.Write(table);
+
+
         AnsiConsole.Markup("Press any key to continue...");
         Console.ReadKey();
     }
