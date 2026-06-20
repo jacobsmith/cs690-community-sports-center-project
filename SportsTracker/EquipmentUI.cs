@@ -3,8 +3,22 @@ using SportsTracker;
 using Spectre.Console;
 using Microsoft.EntityFrameworkCore;
 
-class EquipmentUI
-{
+class EquipmentUI {
+         static List<string> checkoutHours = new List<string>([
+                        "08:00 AM",
+                        "09:00 AM",
+                        "10:00 AM",
+                        "11:00 AM",
+                        "12:00 PM",
+                        "1:00 PM",
+                        "2:00 PM",
+                        "3:00 PM",
+                        "4:00 PM",
+                        "5:00 PM",
+                        "6:00 PM",
+                        "7:00 PM",
+                        "8:00 PM",
+                    ]);
     public static void AddEquipment(AppDbContext db)
     {
 
@@ -171,10 +185,10 @@ class EquipmentUI
     {
         Console.WriteLine("Check Out");
 
-        List<Equipment> equipment = db.Equipment.Where(item => item.inInventory).Where(item => item.Status == EquipmentStatus.Undamaged).ToList();
-        var selectedEquipment = new Selector<Equipment>(equipment).GetSelectionMultiple();
+        List<Equipment> equipment = db.Equipment.Where(item => item.Status == EquipmentStatus.Undamaged).ToList();
+        var selectedEquipment = new Selector<Equipment>(equipment).GetSelectionSingular();
 
-        if (selectedEquipment.Count == 0)
+        if (selectedEquipment == null)
         {
             return;
         }
@@ -233,26 +247,57 @@ class EquipmentUI
             dateOptions.Add(date.ToLongDateString());
         }
 
+        var existingReservations = db.Reservation.Where(r => r.EquipmentReservations.Any(er => er.equipmentId == selectedEquipment.Id)).ToList();
+
 
         var fromDate = AnsiConsole.Prompt(new SelectionPrompt<string>()
         .Title("Select checkout date")
         .AddChoices(dateOptions));
-
+        
         var hours = new List<string>([
-            "8:00 am",
-                        "9:00 am",
-                        "10:00 am",
-                        "11:00 am",
-                        "12:00 pm",
-                        "1:00 pm",
-                        "2:00 pm",
-                        "3:00 pm",
-                        "4:00 pm",
-                        "5:00 pm",
-                        "6:00 pm",
-                        "7:00 pm",
-                        "8:00 pm",
+                        "8:00 AM",
+                        "9:00 AM",
+                        "10:00 AM",
+                        "11:00 AM",
+                        "12:00 PM",
+                        "1:00 PM",
+                        "2:00 PM",
+                        "3:00 PM",
+                        "4:00 PM",
+                        "5:00 PM",
+                        "6:00 PM",
+                        "7:00 PM",
+                        "8:00 PM",
                     ]);
+        
+        foreach (var existingReservation in existingReservations)
+        {
+            var checkoutHour = existingReservation.beginDateTime.ToString("HH:mm tt");
+            var returnHour = existingReservation.endDateTime.ToString("HH:mm tt");
+
+            bool seenCheckoutHour = false;
+            bool seenReturnHour = false;
+            for (var i = 0; i < checkoutHours.Count; i++)
+            {
+                Console.WriteLine("--------------------------------");
+                Console.WriteLine("Checking hour: " + checkoutHours[i]);
+                Console.WriteLine("Seen checkout hour: " + seenCheckoutHour);
+                Console.WriteLine("Seen return hour: " + seenReturnHour);
+                Console.WriteLine("Checkout hour: " + checkoutHour);
+                Console.WriteLine("Return hour: " + returnHour);
+                if (checkoutHour == checkoutHours[i] || seenCheckoutHour && !seenReturnHour)
+                {
+                    Console.WriteLine("Removing hour: " + checkoutHours[i]);
+                    hours.RemoveAt(i);
+                    seenCheckoutHour = true;
+                }
+                if (returnHour == checkoutHours[i])
+                {
+                    seenReturnHour = true;
+                }
+            }
+        }
+
 
         var fromTime = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Checkout Time").AddChoices(hours));
 
@@ -289,7 +334,8 @@ class EquipmentUI
         db.Reservation.Add(reservation);
         db.SaveChanges();
 
-        foreach (var item in selectedEquipment)
+        var equipmentItems = new List<Equipment> { selectedEquipment };
+        foreach (var item in equipmentItems)
         {
             var equipmentReservation = new EquipmentReservation { equipmentId = item.Id, borrower = selectedBorrower, reservationId = reservation.Id };
             db.EquipmentReservation.Add(equipmentReservation);
