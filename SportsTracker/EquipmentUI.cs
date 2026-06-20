@@ -279,12 +279,6 @@ class EquipmentUI {
             bool seenReturnHour = false;
             for (var i = 0; i < checkoutHours.Count; i++)
             {
-                Console.WriteLine("--------------------------------");
-                Console.WriteLine("Checking hour: " + checkoutHours[i]);
-                Console.WriteLine("Seen checkout hour: " + seenCheckoutHour);
-                Console.WriteLine("Seen return hour: " + seenReturnHour);
-                Console.WriteLine("Checkout hour: " + checkoutHour);
-                Console.WriteLine("Return hour: " + returnHour);
                 if (checkoutHour == checkoutHours[i] || seenCheckoutHour && !seenReturnHour)
                 {
                     Console.WriteLine("Removing hour: " + checkoutHours[i]);
