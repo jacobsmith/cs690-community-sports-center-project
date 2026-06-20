@@ -17,11 +17,13 @@ public class Equipment : BaseEntity
     public int? currentlyActiveReservationId { get; set; }
     public Reservation? CurrentlyActiveReservation { get; set; }
 
+    public ICollection<EquipmentDamage> EquipmentDamages { get; set; } = new List<EquipmentDamage>();
     public ICollection<EquipmentReservation> EquipmentReservations { get; set; } = new List<EquipmentReservation>();
     override public string SelectionDisplay()
     {
         return this.Name;
     }
+
 
     public Borrower? CheckedOutTo()
     {

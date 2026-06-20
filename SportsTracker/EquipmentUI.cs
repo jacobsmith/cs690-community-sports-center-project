@@ -60,13 +60,22 @@ class EquipmentUI
 
             if (selected == "yes")
             {
-                var getValue = AnsiConsole.Prompt(new TextPrompt<string>("Approximate value of damages: ").Validate(input => input.Contains("."), "Must enter dollar amount"));
+                var getValue = AnsiConsole.Prompt(new TextPrompt<string>("Charge for damages: ").Validate(input => input.Contains("."), "Must enter dollar amount"));
                 var value = decimal.Parse(getValue);
+
+                var getDescription = AnsiConsole.Prompt(new TextPrompt<string>("Description of damages: "));
+                var description = getDescription;
 
                 item.Status = EquipmentStatus.Damaged;
                 db.SaveChanges();
+            
+                var damagePaid = AnsiConsole.Prompt(
+                    new SelectionPrompt<string>()
+                    .Title("Damage paid?")
+                    .AddChoices(["yes", "no"])
+                );
 
-                var equipmentDamage = new EquipmentDamage { equipment = item, borrower = reservation.EquipmentReservations.First().borrower, damageAmount = value };
+                var equipmentDamage = new EquipmentDamage { equipment = item, borrower = reservation.EquipmentReservations.First().borrower, damageAmount = value, description = description, paid = damagePaid == "yes" };
                 db.EquipmentDamage.Add(equipmentDamage);
                 db.SaveChanges();
             }
@@ -75,6 +84,28 @@ class EquipmentUI
             item.currentlyActiveReservationId = null;
             db.SaveChanges();
         }
+    }
+
+    public static void ViewDamages(AppDbContext db)
+    {
+        Console.WriteLine("View Damages");
+
+        List<EquipmentDamage> damages = db.EquipmentDamage.ToList();
+        var table = new Table();
+        table.AddColumn("Id");
+        table.AddColumn("Equipment");
+        table.AddColumn("Borrower");
+        table.AddColumn("Damage Amount");
+        table.AddColumn("Description");
+
+        foreach (var damage in damages)
+        {
+            table.AddRow(damage.Id.ToString(), damage.equipment.Name, damage.borrower.Name, damage.damageAmount.ToString(), damage.description);
+        }
+
+        AnsiConsole.Write(table);
+        AnsiConsole.Markup("Press any key to continue...");
+        Console.ReadKey();
     }
 
     public static void ViewAllEquipment(AppDbContext db)

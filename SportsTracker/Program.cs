@@ -22,13 +22,14 @@ class Program
         const string ViewAll = "View All Equipment";
         const string AddBorrower = "Add Borrower";
         const string AddEquipment = "Add Equipment";
+        const string ViewDamages = "View Damages";
         const string Quit = "Quit";
 
 
         while (running) {
         // ask employee what to do (add borrower, add equipment, check in equipment, check out equipment)
         var choice = AnsiConsole.Prompt(
-            new SelectionPrompt<string>().Title("What would you like to do?").AddChoices(CheckOut, CheckIn, ViewAll, AddBorrower, AddEquipment, Quit)
+            new SelectionPrompt<string>().Title("What would you like to do?").AddChoices(CheckOut, CheckIn, ViewAll, AddBorrower, AddEquipment, ViewDamages, Quit)
         );
 
         switch (choice)
@@ -56,6 +57,11 @@ class Program
             case (AddEquipment):
                 {
                     EquipmentUI.AddEquipment(db);
+                    break;
+                }
+            case (ViewDamages):
+                {
+                    EquipmentUI.ViewDamages(db);
                     break;
                 }
             case (Quit):
