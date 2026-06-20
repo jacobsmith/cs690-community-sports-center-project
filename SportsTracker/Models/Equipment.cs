@@ -22,4 +22,9 @@ public class Equipment : BaseEntity
     {
         return this.Name;
     }
+
+    public Borrower? CheckedOutTo()
+    {
+        return this.CurrentlyActiveReservation?.EquipmentReservations.First().borrower;
+    }
 }

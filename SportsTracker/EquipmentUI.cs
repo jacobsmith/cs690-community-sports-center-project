@@ -1,6 +1,7 @@
 namespace SportsTracker;
 using SportsTracker;
 using Spectre.Console;
+using Microsoft.EntityFrameworkCore;
 
 class EquipmentUI
 {
@@ -38,10 +39,18 @@ class EquipmentUI
 
         Console.WriteLine("Check In Equipment");
 
-        List<Equipment> equipment = db.Equipment.Where(item => !item.inInventory).ToList();
+        List<Equipment> equipment = db.Equipment.Where(item => item.currentlyActiveReservationId != null).ToList();
 
         var item = new Selector<Equipment>(equipment).GetSelectionSingular();
         if (item != null) {
+
+            var reservation = db.Reservation.Find(item.currentlyActiveReservationId);
+
+            if (reservation == null) {
+                Console.WriteLine("No reservation found for this item. Press any key to continue.");
+                Console.ReadKey();
+                return;
+            }
 
             var selected = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
@@ -54,14 +63,16 @@ class EquipmentUI
                 var getValue = AnsiConsole.Prompt(new TextPrompt<string>("Approximate value of damages: ").Validate(input => input.Contains("."), "Must enter dollar amount"));
                 var value = decimal.Parse(getValue);
 
+                item.Status = EquipmentStatus.Damaged;
+                db.SaveChanges();
 
-
-                // db.EquipmentDamange.Add(new EquipmentDamage { equipment = item, borrower =  })
+                var equipmentDamage = new EquipmentDamage { equipment = item, borrower = reservation.EquipmentReservations.First().borrower, damageAmount = value };
+                db.EquipmentDamage.Add(equipmentDamage);
+                db.SaveChanges();
             }
 
-
-
             item.inInventory = true;
+            item.currentlyActiveReservationId = null;
             db.SaveChanges();
         }
     }
@@ -69,14 +80,21 @@ class EquipmentUI
     public static void ViewAllEquipment(AppDbContext db)
     {
 
-        List<Equipment> equipment = db.Equipment.ToList();
+        List<Equipment> equipment = db.Equipment.
+            Include(e => e.CurrentlyActiveReservation).
+            ThenInclude(r => r.EquipmentReservations).
+            ThenInclude(er => er.borrower).
+            ToList();
+        
         var table = new Table();
         table.AddColumn("Name");
         table.AddColumn("In Stock");
+        table.AddColumn("Status");
+        table.AddColumn("Checked Out To");
 
         foreach (var item in equipment)
         {
-            table.AddRow(item.Name, item.inInventory.ToString());
+            table.AddRow(item.Name, item.inInventory.ToString(), item.Status.ToString(), item.CheckedOutTo()?.Name ?? "Not Checked Out");
         }
 
         AnsiConsole.Write(table);
@@ -195,16 +213,21 @@ class EquipmentUI
             .AddChoices(["yes", "no"])
         ) == "yes";
 
+        var reservation = new Reservation { beginDateTime = beginDateTime, endDateTime = endDateTime };
+        db.Reservation.Add(reservation);
+        db.SaveChanges();
 
-        // foreach (var item in selectedEquipment)
-        // {
-        //     var reservation = new Reservation { beginDateTime = beginDateTime, endDateTime = endDateTime, equipment = item, borrower = selectedBorrower, borrowerHasItem = borrowerHasItem };
-        //     db.Reservation.Add(reservation);
-        //     item.inInventory = !borrowerHasItem;
+        foreach (var item in selectedEquipment)
+        {
+            var equipmentReservation = new EquipmentReservation { equipmentId = item.Id, borrower = selectedBorrower, reservationId = reservation.Id };
+            db.EquipmentReservation.Add(equipmentReservation);
 
-        //     db.SaveChanges();
-        // }
-
-
+            // set the item to be currently active reservation
+            if (borrowerHasItem) {
+                item.currentlyActiveReservationId = reservation.Id;
+            }
+            item.inInventory = !borrowerHasItem;
+        }
+        db.SaveChanges();
     }
 }

@@ -9,7 +9,7 @@ public class EquipmentReservation : BaseEntity
 
     public Equipment Equipment { get; set; }
 
-    public required Borrower borrower { get; set; }
+    public Borrower borrower { get; set; }
 
     public DateTime? returnedAt { get; set; }
 

@@ -6,7 +6,7 @@ public class EquipmentDamage : BaseEntity
 {
     public required Equipment equipment { get; set; }
     public required Borrower borrower { get; set; }
-    public required int damageAmount { get; set; }
+    public required decimal damageAmount { get; set; }
 
     override public string SelectionDisplay()
     {
