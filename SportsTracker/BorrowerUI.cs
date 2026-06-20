@@ -51,7 +51,7 @@ class BorrowerUI
             var totalDamage = borrowerToPrint.EquipmentDamages.Where(ed => ed.paid == false).Sum(ed => ed.damageAmount);
             var activeReservations = borrowerToPrint.EquipmentReservations.Where(er => er.Equipment.currentlyActiveReservationId == er.reservationId);
 
-            table.AddRow(borrowerToPrint.Id.ToString(), borrowerToPrint.Name, borrowerToPrint.PhoneNumber, borrowerToPrint.EquipmentReservations.Count.ToString() + " items", totalDamage.ToString());
+            table.AddRow(borrowerToPrint.Id.ToString(), borrowerToPrint.Name, borrowerToPrint.PhoneNumber, activeReservations.Count().ToString() + " item(s)", totalDamage.ToString());
 
             foreach (var activeReservation in activeReservations)
             {
