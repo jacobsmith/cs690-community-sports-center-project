@@ -90,7 +90,8 @@ class EquipmentUI
     {
         Console.WriteLine("View Damages");
 
-        List<EquipmentDamage> damages = db.EquipmentDamage.ToList();
+        List<EquipmentDamage> damages = db.EquipmentDamage.Include(ed => ed.equipment).Include(ed => ed.borrower).ToList();
+        var damagedEquipment = damages.Where(ed => ed.equipment.Status == EquipmentStatus.Damaged).ToList();
         var table = new Table();
         table.AddColumn("Id");
         table.AddColumn("Equipment");
@@ -98,12 +99,27 @@ class EquipmentUI
         table.AddColumn("Damage Amount");
         table.AddColumn("Description");
 
-        foreach (var damage in damages)
+        foreach (var damage in damagedEquipment)
         {
             table.AddRow(damage.Id.ToString(), damage.equipment.Name, damage.borrower.Name, damage.damageAmount.ToString(), damage.description);
         }
 
         AnsiConsole.Write(table);
+        
+        var getId = AnsiConsole.Prompt(new TextPrompt<string>("ID of damage to mark as fixed or Q to quit: "));
+
+        if (getId.ToUpper() == "Q")
+        {
+            return;
+        }
+
+        var id = int.Parse(getId);
+        var equipmentDamage = db.EquipmentDamage.Include(ed => ed.equipment).FirstOrDefault(ed => ed.Id == id);
+        if (equipmentDamage != null)
+        {
+            equipmentDamage.equipment.Status = EquipmentStatus.Undamaged;
+            db.SaveChanges();
+        }
 
 
         AnsiConsole.Markup("Press any key to continue...");
