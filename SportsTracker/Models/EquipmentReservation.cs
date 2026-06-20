@@ -16,6 +16,6 @@ public class EquipmentReservation : BaseEntity
     // This acts as a join table so won't be printed directly
     override public string SelectionDisplay()
     {
-        return "";
+        return this.Equipment.SelectionDisplay() + " " + this.borrower.SelectionDisplay() + " " + this.Reservation.SelectionDisplay();
     }
 }
