@@ -6,24 +6,38 @@ using SportsTracker;
 class Selector<T> where T: BaseEntity
 {
     List<T> choices;
-    // List<T>? databaseCollection = null;
 
     public Selector(List<T> choices)
     {
         this.choices = choices;
     }
 
-    // public void SetChoices(List<T> choices)
-    // {
-    //     this.choices = choices;
-    // }
+    public T GetSelectionSingular()
+    {
+        if (this.choices.Count == 0)
+        {
+            Console.WriteLine("No items to select from. Press any key to continue.");
+            Console.ReadKey();
+            return null;
+        }
 
-    // public void SetDatabaseCollection(List<T> databaseCollection)
-    // {
-    //     this.databaseCollection = databaseCollection;
-    // }
+        var choices = new List<string>();
+        foreach (var item in this.choices)
+        {
+            choices.Add(item.Id.ToString() + ":" + item.SelectionDisplay());
+        }
 
-    public List<T> GetSelection()
+            var selected = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                .Title("Select")
+                .AddChoices(choices.ToArray())
+            );
+            
+            var selectedItemId = Int32.Parse(selected.Split(":")[0]);
+            return this.choices.Find(equipment => equipment.Id == selectedItemId);
+    }
+
+    public List<T> GetSelectionMultiple(Boolean singular = false)
     {
         if (this.choices.Count == 0)
         {
@@ -43,8 +57,7 @@ class Selector<T> where T: BaseEntity
             .Title("Select")
             .AddChoices(choices.ToArray())
         );
-
-
+    
         var selectedItems = new List<Int32>();
         foreach (var item in selected)
         {
@@ -52,8 +65,7 @@ class Selector<T> where T: BaseEntity
         }
 
         var selectedEquipment = this.choices.FindAll(equipment => selectedItems.Contains(equipment.Id));
-
         return selectedEquipment;
-    }
 
+    }
 }

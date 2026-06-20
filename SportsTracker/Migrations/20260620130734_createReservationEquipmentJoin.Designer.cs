@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SportsTracker;
 
@@ -10,9 +11,11 @@ using SportsTracker;
 namespace SportsTracker.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260620130734_createReservationEquipmentJoin")]
+    partial class createReservationEquipmentJoin
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.8");
@@ -74,17 +77,10 @@ namespace SportsTracker.Migrations
                     b.Property<int>("borrowerId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<decimal>("damageAmount")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("description")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("equipmentId")
+                    b.Property<int>("damageAmount")
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("paid")
+                    b.Property<int>("equipmentId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -154,13 +150,13 @@ namespace SportsTracker.Migrations
             modelBuilder.Entity("SportsTracker.EquipmentDamage", b =>
                 {
                     b.HasOne("SportsTracker.Borrower", "borrower")
-                        .WithMany("EquipmentDamages")
+                        .WithMany()
                         .HasForeignKey("borrowerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SportsTracker.Equipment", "equipment")
-                        .WithMany("EquipmentDamages")
+                        .WithMany()
                         .HasForeignKey("equipmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -173,7 +169,7 @@ namespace SportsTracker.Migrations
             modelBuilder.Entity("SportsTracker.EquipmentReservation", b =>
                 {
                     b.HasOne("SportsTracker.Borrower", "borrower")
-                        .WithMany("EquipmentReservations")
+                        .WithMany()
                         .HasForeignKey("borrowerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -197,17 +193,8 @@ namespace SportsTracker.Migrations
                     b.Navigation("borrower");
                 });
 
-            modelBuilder.Entity("SportsTracker.Borrower", b =>
-                {
-                    b.Navigation("EquipmentDamages");
-
-                    b.Navigation("EquipmentReservations");
-                });
-
             modelBuilder.Entity("SportsTracker.Equipment", b =>
                 {
-                    b.Navigation("EquipmentDamages");
-
                     b.Navigation("EquipmentReservations");
                 });
 

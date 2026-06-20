@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SportsTracker;
 
@@ -10,9 +11,11 @@ using SportsTracker;
 namespace SportsTracker.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260620174403_AddDescriptionToDamages")]
+    partial class AddDescriptionToDamages
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.8");
@@ -84,9 +87,6 @@ namespace SportsTracker.Migrations
                     b.Property<int>("equipmentId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("paid")
-                        .HasColumnType("INTEGER");
-
                     b.HasKey("Id");
 
                     b.HasIndex("borrowerId");
@@ -154,7 +154,7 @@ namespace SportsTracker.Migrations
             modelBuilder.Entity("SportsTracker.EquipmentDamage", b =>
                 {
                     b.HasOne("SportsTracker.Borrower", "borrower")
-                        .WithMany("EquipmentDamages")
+                        .WithMany()
                         .HasForeignKey("borrowerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -173,7 +173,7 @@ namespace SportsTracker.Migrations
             modelBuilder.Entity("SportsTracker.EquipmentReservation", b =>
                 {
                     b.HasOne("SportsTracker.Borrower", "borrower")
-                        .WithMany("EquipmentReservations")
+                        .WithMany()
                         .HasForeignKey("borrowerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -195,13 +195,6 @@ namespace SportsTracker.Migrations
                     b.Navigation("Reservation");
 
                     b.Navigation("borrower");
-                });
-
-            modelBuilder.Entity("SportsTracker.Borrower", b =>
-                {
-                    b.Navigation("EquipmentDamages");
-
-                    b.Navigation("EquipmentReservations");
                 });
 
             modelBuilder.Entity("SportsTracker.Equipment", b =>

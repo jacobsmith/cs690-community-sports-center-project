@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SportsTracker;
 
@@ -10,9 +11,11 @@ using SportsTracker;
 namespace SportsTracker.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260615152209_setReservationAsACtive")]
+    partial class setReservationAsACtive
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.8");
@@ -52,15 +55,10 @@ namespace SportsTracker.Migrations
                     b.Property<decimal>("ValueInDecimal")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("currentlyActiveReservationId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<bool>("inInventory")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("currentlyActiveReservationId");
 
                     b.ToTable("Equipment");
                 });
@@ -74,17 +72,10 @@ namespace SportsTracker.Migrations
                     b.Property<int>("borrowerId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<decimal>("damageAmount")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("description")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("equipmentId")
+                    b.Property<int>("damageAmount")
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("paid")
+                    b.Property<int>("equipmentId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -96,35 +87,6 @@ namespace SportsTracker.Migrations
                     b.ToTable("EquipmentDamage");
                 });
 
-            modelBuilder.Entity("SportsTracker.EquipmentReservation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("borrowerId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("equipmentId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("reservationId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime?>("returnedAt")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("borrowerId");
-
-                    b.HasIndex("equipmentId");
-
-                    b.HasIndex("reservationId");
-
-                    b.ToTable("EquipmentReservation");
-                });
-
             modelBuilder.Entity("SportsTracker.Reservation", b =>
                 {
                     b.Property<int>("Id")
@@ -134,33 +96,37 @@ namespace SportsTracker.Migrations
                     b.Property<DateTime>("beginDateTime")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("borrowerHasItem")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("borrowerId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateTime>("endDateTime")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("equipmentId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("borrowerId");
+
+                    b.HasIndex("equipmentId");
+
                     b.ToTable("Reservation");
-                });
-
-            modelBuilder.Entity("SportsTracker.Equipment", b =>
-                {
-                    b.HasOne("SportsTracker.Reservation", "CurrentlyActiveReservation")
-                        .WithMany()
-                        .HasForeignKey("currentlyActiveReservationId");
-
-                    b.Navigation("CurrentlyActiveReservation");
                 });
 
             modelBuilder.Entity("SportsTracker.EquipmentDamage", b =>
                 {
                     b.HasOne("SportsTracker.Borrower", "borrower")
-                        .WithMany("EquipmentDamages")
+                        .WithMany()
                         .HasForeignKey("borrowerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SportsTracker.Equipment", "equipment")
-                        .WithMany("EquipmentDamages")
+                        .WithMany()
                         .HasForeignKey("equipmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -170,50 +136,23 @@ namespace SportsTracker.Migrations
                     b.Navigation("equipment");
                 });
 
-            modelBuilder.Entity("SportsTracker.EquipmentReservation", b =>
+            modelBuilder.Entity("SportsTracker.Reservation", b =>
                 {
                     b.HasOne("SportsTracker.Borrower", "borrower")
-                        .WithMany("EquipmentReservations")
+                        .WithMany()
                         .HasForeignKey("borrowerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SportsTracker.Equipment", "Equipment")
-                        .WithMany("EquipmentReservations")
+                    b.HasOne("SportsTracker.Equipment", "equipment")
+                        .WithMany()
                         .HasForeignKey("equipmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SportsTracker.Reservation", "Reservation")
-                        .WithMany("EquipmentReservations")
-                        .HasForeignKey("reservationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Equipment");
-
-                    b.Navigation("Reservation");
-
                     b.Navigation("borrower");
-                });
 
-            modelBuilder.Entity("SportsTracker.Borrower", b =>
-                {
-                    b.Navigation("EquipmentDamages");
-
-                    b.Navigation("EquipmentReservations");
-                });
-
-            modelBuilder.Entity("SportsTracker.Equipment", b =>
-                {
-                    b.Navigation("EquipmentDamages");
-
-                    b.Navigation("EquipmentReservations");
-                });
-
-            modelBuilder.Entity("SportsTracker.Reservation", b =>
-                {
-                    b.Navigation("EquipmentReservations");
+                    b.Navigation("equipment");
                 });
 #pragma warning restore 612, 618
         }
