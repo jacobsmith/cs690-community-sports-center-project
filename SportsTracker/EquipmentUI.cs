@@ -136,6 +136,7 @@ class EquipmentUI
             ToList();
         
         var table = new Table();
+        table.AddColumn("Id");
         table.AddColumn("Name");
         table.AddColumn("In Stock");
         table.AddColumn("Status");
@@ -143,12 +144,27 @@ class EquipmentUI
 
         foreach (var item in equipment)
         {
-            table.AddRow(item.Name, item.inInventory.ToString(), item.Status.ToString(), item.CheckedOutTo()?.Name ?? "Not Checked Out");
+            table.AddRow(item.Id.ToString(), item.Name, item.inInventory.ToString(), item.Status.ToString(), item.CheckedOutTo()?.Name ?? "Not Checked Out");
         }
 
         AnsiConsole.Write(table);
-        AnsiConsole.Markup("Press any key to continue...");
-        Console.ReadKey();
+        
+        var getId = AnsiConsole.Prompt(new TextPrompt<string>("ID of item to toggle in inventory or Q to quit: "));
+
+        if (getId.ToUpper() == "Q")
+        {
+            return;
+        }
+
+        var id = int.Parse(getId);
+        var equipmentItem = db.Equipment.Find(id);
+        if (equipmentItem != null)
+        {
+            equipmentItem.inInventory = !equipmentItem.inInventory;
+            db.SaveChanges();
+        }
+
+        ViewAllEquipment(db);
     }
 
     public static void CheckOutEquipment(AppDbContext db)
@@ -193,6 +209,13 @@ class EquipmentUI
 
             if (possibleBorrower != null)
             {
+                // don't let the borrower check out if they have unpaid damages
+                if (possibleBorrower.EquipmentDamages.Where(ed => ed.paid == false).Count() > 0)
+                {
+                    Console.WriteLine("Borrower has unpaid damages. They must pay first before checking out more equipment. Press any key to continue.");
+                    Console.ReadKey();
+                    return;
+                }
                 selectedBorrower = possibleBorrower;
             }
         }
